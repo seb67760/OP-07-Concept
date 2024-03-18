@@ -61,6 +61,9 @@ if page == pages[2] :
     
     df = pd.read_csv(path_import + filename_import)
 
+    with st.echo():
+    st.write(f"streamlit version: {st.__version__}")
+
     tab1, tab2 = st.tabs(['Nbre de bâtiments par quartier et par type', 'Bâtiments par longitude et latitude'])
     with tab1:
         fig = plt.figure(figsize=(10, 4))
