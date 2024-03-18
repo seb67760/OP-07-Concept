@@ -144,7 +144,7 @@ if page == pages[3] :
                             ]
     
    # Qlattice
-    df = pd.read_csv(path_import + filename_import)    
+    df = pd.read_csv(filename_import)    
     variables2 = ['BuildingType','PrimaryPropertyType','Latitude','Longitude','NumberofBuildings','NumberofFloors',
                      'PropertyGFAParking','PropertyGFABuilding(s)','bulding_age','Steamuse_bool',
                  'NaturalGas_bool','SiteEnergyUse(kBtu)']
