@@ -187,10 +187,7 @@ if page == pages[3] :
 
     tab1, tab2, tab3 = st.tabs(["Résultats Kernel Ridge", "Résultats Qlattice", "Kernel Vs Qlattice"])
     with tab1:
-        fig1 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values', 
-                          trendline="ols",
-                          trendline_color_override="red",
-                          title= "Kernel results values")
+        fig1 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values', trendline="ols", trendline_color_override="red",title= "Kernel results values")
         st.plotly_chart(fig1, use_container_width=True)
         
         fig2 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values', 
