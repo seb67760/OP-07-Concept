@@ -102,10 +102,9 @@ if page == pages[2] :
 
     
 if page == pages[3] :    
-
-    path_import     = "data/cleaned/"
-    filename_import = "df_for_modelisation.csv"
-    df = pd.read_csv(path_import + filename_import)
+    
+    filename_import = r'./data/cleaned/df_for_modelisation.csv'
+    df = pd.read_csv(filename_import)
     
     
     #Kernel Ridge
