@@ -183,7 +183,6 @@ if page == pages[3] :
     model_dataset = pd.concat([kernel_dataset, qlattice_dataset])
 
     tab1, tab2, tab3 = st.tabs(["Résultats Kernel Ridge", "Résultats Qlattice", "Kernel Vs Qlattice"])
-    
     with tab1:
         fig1 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values', 
                           trendline="ols",
