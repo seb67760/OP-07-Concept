@@ -61,7 +61,7 @@ if page == pages[2] :
     
     df = pd.read_csv(path_import + filename_import)
 
-    tab1, tab2 = st.tabs(["Nbre de bâtiments par quartier et par type", "Bâtiments par longitude et latitude"])
+    tab1, tab2 = st.tabs(['Nbre de bâtiments par quartier et par type', 'Bâtiments par longitude et latitude'])
     with tab1:
         fig = plt.figure(figsize=(10, 4))
         sns.countplot(x='Neighborhood', data = df, order= df['Neighborhood'].value_counts().index)
