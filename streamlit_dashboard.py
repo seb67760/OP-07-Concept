@@ -189,7 +189,7 @@ if page == pages[3] :
         st.dataframe(qlattice_dataset)
         st.dataframe(model_dataset)
 
-        fig3 = px.scatter(x= 'y_test', y= kernel_ridge_model.predict(X_test), trendline="ols", trendline_color_override="red",title= "Kernel results)
+        fig3 = px.scatter(x= 'y_test', y= kernel_ridge_model.predict(X_test), trendline="ols", trendline_color_override="red",title= "Kernel results")
         st.plotly_chart(fig3, use_container_width=True)
 
 
