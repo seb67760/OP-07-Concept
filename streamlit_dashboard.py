@@ -260,8 +260,7 @@ if page == pages[4] :
                                            'bulding_age', 'Steamuse_bool', 'NaturalGas_bool', 'SiteEnergyUse(kBtu)'])
         
     qlattice_model = feyn.Model.load('model/qlattice_model.json')
-    
-#    reponse = qlattice_model.predict(test)
+  
     reponse = qlattice_model.predict(prediction_df)[0].round(0)
     
     st.write("### Qlattice prediction")
