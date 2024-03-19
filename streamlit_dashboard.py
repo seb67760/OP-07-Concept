@@ -231,37 +231,35 @@ if page == pages[4] :
 
 
     col1, col2, col3 = st.columns(3)
-    
+
     with col1:
-        
-        
         val_BuildingType = st.text_input('BuildingType', 'NonResidential')
         val_PrimaryPropertyType = st.selectbox('PrimaryPropertytype', propertytype_list, index = 7)
 #        val_PrimaryPropertyType = st.text_input('PrimaryPropertytype', 'Hotel')
-        val_Latitude = st.text_input('Latitude', 47.61345)
-        val_Longitude = st.text_input('Longitude', -122.34068)
+        val_Latitude = st.number_input('Latitude', 47.61345)
+        val_Longitude = st.number_input('Longitude', -122.34068)
 
     with col2:
-        val_NumberofBuildings = st.text_input('Numberofbuilding', 1)
-        val_NumberofFloors = st.text_input('NumberofFloors', 9)
-        val_PropertyGFAParking = st.text_input('PropertyGFAParking', 0)
-        val_PropertyGFABuilding = st.text_input('PropertyGFABuilding', 104000)
+        val_NumberofBuildings = st.number_input('Numberofbuilding', 1)
+        val_NumberofFloors = st.number_input('NumberofFloors', 9)
+        val_PropertyGFAParking = st.number_input('PropertyGFAParking', 0)
+        val_PropertyGFABuilding = st.number_input('PropertyGFABuilding', 104000, step= 1000)
         
     with col3:
-        val_bulding_age = st.text_input('bulding_age', 91)
-        val_Steamuse_bool = st.text_input('Streamuse_bool', 1)
-        val_NaturalGas_bool = st.text_input('NaturalGas_bool', 1)
+        val_bulding_age = st.number_input('bulding_age', 91)
+        val_Steamuse_bool = st.number_input('Streamuse_bool', 1)
+        val_NaturalGas_bool = st.number_input('NaturalGas_bool', 1)
         
-    prediction_df = pd.DataFrame([[val_BuildingType, val_PrimaryPropertyType, float(val_Latitude), float(val_Longitude),
-                                   float(val_NumberofBuildings), float(val_NumberofFloors), float(val_PropertyGFAParking), float(val_PropertyGFABuilding),
-                                   float(val_bulding_age), float(val_Steamuse_bool), float(val_NaturalGas_bool), float(0)]],
+    prediction_df = pd.DataFrame([[val_BuildingType, val_PrimaryPropertyType, val_Latitude, val_Longitude,
+                                   val_NumberofBuildings, val_NumberofFloors, val_PropertyGFAParking, val_PropertyGFABuilding,
+                                   val_bulding_age, val_Steamuse_bool, val_NaturalGas_bool, 0]],
                                  columns= ['BuildingType','PrimaryPropertyType', 'Latitude', 'Longitude',
                                            'NumberofBuildings', 'NumberofFloors', 'PropertyGFAParking','PropertyGFABuilding(s)',
-                                           'bulding_age', 'Steamuse_bool', 'NaturalGas_bool', 'SiteEnergyUse(kBtu)'])
+                                              'bulding_age', 'Steamuse_bool', 'NaturalGas_bool', 'SiteEnergyUse(kBtu)'])
         
     qlattice_model = feyn.Model.load('model/qlattice_model.json')
-  
-    reponse = qlattice_model.predict(prediction_df)[0].round(0)
+    
+    reponse_qlattice = qlattice_model.predict(prediction_df)[0].round(0)
     
     st.write("### Qlattice prediction")
-    st.write("Site Energy Use:", f"{reponse:,.0f}")
+    st.write("Site Energy Use:", f"{reponse_qlattice:,.0f}")
