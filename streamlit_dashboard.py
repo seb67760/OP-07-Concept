@@ -61,9 +61,7 @@ if page == pages[2] :
     
     df = pd.read_csv(path_import + filename_import)
 
-    with st.echo():
-        st.write(f"streamlit version: {st.__version__}")
-
+    
     tab1, tab2 = st.tabs(['Nbre de bâtiments par quartier et par type', 'Bâtiments par longitude et latitude'])
     with tab1:
         fig = plt.figure(figsize=(10, 4))
@@ -187,6 +185,12 @@ if page == pages[3] :
 
     tab1, tab2, tab3 = st.tabs(["Résultats Kernel Ridge", "Résultats Qlattice", "Kernel Vs Qlattice"])
     with tab1:
+        st.dataframe(kernel_dataset)
+        st.dataframe(qlattice_dataset)
+        st.dataframe(model_dataset)
+
+
+        
         fig1 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values', trendline="ols", trendline_color_override="red",title= "Kernel results values")
         st.plotly_chart(fig1, use_container_width=True)
         
