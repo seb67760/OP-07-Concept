@@ -1,10 +1,3 @@
-# -*- coding: utf-8 -*-
-"""
-Created on Tue Jul 18 14:57:06 2023
-
-@author: PC.054
-"""
-
 import pandas as pd 
 import numpy as np 
 import streamlit as st 
@@ -15,33 +8,27 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 import feyn
-
-
 import pickle
-
-#df=pd.read_csv("Housing.csv")
 
 st.sidebar.title("Sommaire")
 
-pages = ["Contexte du projet", "Exploration des données", "Analyse de données", "Modélisation"]
+pages = ["Contexte du projet", "Exploration des données", "Analyse de données", "Modélisation", "Prédiction"]
 
 page = st.sidebar.radio("Aller vers la page :", pages)
 
 if page == pages[0] : 
     
-    st.write("### Contexte du projet")
+    st.write("## Contexte du projet")
     
     st.write("Des relevés minutieux ont été effectués par les agents de la ville de Seattle en 2016. Néanmoins, ces relevés sont coûteux à obtenir, et à partir de ceux déjà réalisés, vous allons tenter de prédire les émissions de CO2 de bâtiments non destinés à l’habitation pour lesquels elles n’ont pas encore été mesurées.")
-    
     st.write("Nous avons à notre disposition le fichier 2016_Building_Energy_Benchmarking.csv qui contient des données des différents buldings de la ville. Chaque observation en ligne correspond à un bâtiment. Chaque variable en colonne est une caractéristique du bâtiment.")
-    
     st.write("Dans un premier temps, nous explorerons ce dataset. Puis nous l'analyserons visuellement pour en extraire des informations selon certains axes d'étude. Finalement nous implémenterons des modèles de Machine Learning pour prédire la consommation d'énergie.")
 
     file_image = r'./data/image/Seattle.JPG'
     st.image(file_image)
     
 if page == pages[1] :
-    st.write("### Exploration des données")
+    st.write("## Exploration des données")
     
     path_import     = "./data/source/"
     filename_import = "2016_Building_Energy_Benchmarking.csv"
@@ -56,6 +43,7 @@ if page == pages[1] :
     
 
 if page == pages[2] :
+    st.write("## Analyse des données")
     path_import     = "data/cleaned/"
     filename_import = "df_for_modelisation.csv"
     
@@ -102,7 +90,10 @@ if page == pages[2] :
     st.write(fig4, theme="streamlit")
 
     
-if page == pages[3] :    
+if page == pages[3] :
+    
+    st.write("## Modélisation")
+    
     
     filename_import = r'./data/cleaned/df_for_modelisation.csv'
     df = pd.read_csv(filename_import)
@@ -226,5 +217,52 @@ if page == pages[3] :
                           title= "Kernel vs Qlattice results values")
         st.plotly_chart(fig2, use_container_width=True)
     
+if page == pages[4] :
+    st.write("## Prédictions")
+   
+    propertytype_list = ['Retail Store', 'Mixed Use Property', 'Worship Facility',
+    'Small- and Mid-Sized Office', 'Other', 'Large Office',
+    'K-12 School', 'Hotel', 'Residence Hall', 'Self-Storage Facility',
+    'Distribution Center', 'Warehouse', 'Medical Office',
+    'Refrigerated Warehouse', 'University',
+    'Supermarket / Grocery Store', 'Restaurant',
+    'Senior Care Community', 'Low-Rise Multifamily', 'Laboratory',
+    'Office', 'Hospital']
+
+
+    col1, col2, col3 = st.columns(3)
     
-          
+    with col1:
+        
+        
+        val_BuildingType = st.text_input('BuildingType', 'NonResidential')
+        val_PrimaryPropertyType = st.selectbox('PrimaryPropertytype', propertytype_list, index = 7)
+#        val_PrimaryPropertyType = st.text_input('PrimaryPropertytype', 'Hotel')
+        val_Latitude = st.text_input('Latitude', 47.61345)
+        val_Longitude = st.text_input('Longitude', -122.34068)
+
+    with col2:
+        val_NumberofBuildings = st.text_input('Numberofbuilding', 1)
+        val_NumberofFloors = st.text_input('NumberofFloors', 9)
+        val_PropertyGFAParking = st.text_input('PropertyGFAParking', 0)
+        val_PropertyGFABuilding = st.text_input('PropertyGFABuilding', 104000)
+        
+    with col3:
+        val_bulding_age = st.text_input('bulding_age', 91)
+        val_Steamuse_bool = st.text_input('Streamuse_bool', 1)
+        val_NaturalGas_bool = st.text_input('NaturalGas_bool', 1)
+        
+    prediction_df = pd.DataFrame([[val_BuildingType, val_PrimaryPropertyType, float(val_Latitude), float(val_Longitude),
+                                   float(val_NumberofBuildings), float(val_NumberofFloors), float(val_PropertyGFAParking), float(val_PropertyGFABuilding),
+                                   float(val_bulding_age), float(val_Steamuse_bool), float(val_NaturalGas_bool), float(0)]],
+                                 columns= ['BuildingType','PrimaryPropertyType', 'Latitude', 'Longitude',
+                                           'NumberofBuildings', 'NumberofFloors', 'PropertyGFAParking','PropertyGFABuilding(s)',
+                                           'bulding_age', 'Steamuse_bool', 'NaturalGas_bool', 'SiteEnergyUse(kBtu)'])
+        
+    qlattice_model = feyn.Model.load('model/qlattice_model.json')
+    
+#    reponse = qlattice_model.predict(test)
+    reponse = qlattice_model.predict(prediction_df)[0].round(0)
+    
+    st.write("### Qlattice prediction")
+    st.write("Site Energy Use:", f"{reponse:,.0f}")
