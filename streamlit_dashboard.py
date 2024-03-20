@@ -1,5 +1,5 @@
-import pandas as pd 
-import numpy as np 
+
+import pandas as pd  
 import streamlit as st 
 import seaborn as sns 
 import matplotlib.pyplot as plt
@@ -8,7 +8,11 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 import feyn
+
+
 import pickle
+
+#df=pd.read_csv("Housing.csv")
 
 st.sidebar.title("Sommaire")
 
@@ -21,7 +25,9 @@ if page == pages[0] :
     st.write("## Contexte du projet")
     
     st.write("Des relevés minutieux ont été effectués par les agents de la ville de Seattle en 2016. Néanmoins, ces relevés sont coûteux à obtenir, et à partir de ceux déjà réalisés, vous allons tenter de prédire les émissions de CO2 de bâtiments non destinés à l’habitation pour lesquels elles n’ont pas encore été mesurées.")
+    
     st.write("Nous avons à notre disposition le fichier 2016_Building_Energy_Benchmarking.csv qui contient des données des différents buldings de la ville. Chaque observation en ligne correspond à un bâtiment. Chaque variable en colonne est une caractéristique du bâtiment.")
+    
     st.write("Dans un premier temps, nous explorerons ce dataset. Puis nous l'analyserons visuellement pour en extraire des informations selon certains axes d'étude. Finalement nous implémenterons des modèles de Machine Learning pour prédire la consommation d'énergie.")
 
     file_image = r'./data/image/Seattle.JPG'
@@ -164,43 +170,63 @@ if page == pages[3] :
     kernel_dataset= pd.DataFrame()
     kernel_dataset['true_values']= y_test
     kernel_dataset['predict_values']= kernel_ridge_model.predict(X_test)
+    kernel_dataset = kernel_dataset.merge(df[['PrimaryPropertyType']], left_index=True, right_index=True)
     kernel_dataset['model']= "kernel"
     kernel_dataset = kernel_dataset.reset_index()
     
     qlattice_dataset= pd.DataFrame()
     qlattice_dataset['true_values']= test['SiteEnergyUse(kBtu)']
     qlattice_dataset['predict_values']= qlattice_model.predict(test)
+    qlattice_dataset['PrimaryPropertyType']= test['PrimaryPropertyType']
     qlattice_dataset['model']= "qlattice"
     qlattice_dataset = qlattice_dataset.reset_index()
+
     model_dataset = pd.concat([kernel_dataset, qlattice_dataset])
+    
+    st.dataframe(model_dataset)
 
     tab1, tab2, tab3 = st.tabs(["Résultats Kernel Ridge", "Résultats Qlattice", "Kernel Vs Qlattice"])
     with tab1:
-        fig1 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values', trendline="ols", trendline_color_override="red",title= "Kernel results values")
+        fig1 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values',
+                          color= 'PrimaryPropertyType',
+                          trendline="ols",
+                          trendline_color_override="red",
+                          trendline_scope="overall",
+                          title= "Kernel results values")
         st.plotly_chart(fig1, use_container_width=True)
         
-        fig2 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values', 
+        fig2 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values',
+                          color= 'PrimaryPropertyType',
                           log_x=True, log_y= True,
                           trendline="ols", 
                           trendline_color_override="red",
+                          trendline_scope="overall",
                           title= "Kernel results Log values")
         st.plotly_chart(fig2, use_container_width=True)
         
  
     with tab2:
         fig1 = px.scatter(qlattice_dataset, x= 'true_values', y= 'predict_values',
+                          color= 'PrimaryPropertyType',
                           trendline="ols",
                           trendline_color_override="red",
+                          trendline_scope="overall",
                           title= "Qlattice results values")
         
         st.plotly_chart(fig1, use_container_width=True)
         
-        fig2 = px.scatter(qlattice_dataset, x= 'true_values', y= 'predict_values', 
+        fig2 = px.scatter(qlattice_dataset, x= 'true_values', y= 'predict_values',
+                          color= 'PrimaryPropertyType',
                           log_x=True, log_y= True,
                           trendline="ols",
                           trendline_color_override="red",
+                          trendline_scope="overall",
                           title= "Qlattice results Log values")
         st.plotly_chart(fig2, use_container_width=True)
+        
+        st.write("Qlattice semble avoir du mal avec bâtiments de type 'Hospital' ou 'Office'.")
+        st.write("Qlattice semble être beaucoup plus performant avec 'Hotel', 'Large office' et 'K-12 School' par exemple.")
+     
                
     with tab3:
         
@@ -220,6 +246,7 @@ if page == pages[3] :
 if page == pages[4] :
     st.write("## Prédictions")
    
+    
     propertytype_list = ['Retail Store', 'Mixed Use Property', 'Worship Facility',
     'Small- and Mid-Sized Office', 'Other', 'Large Office',
     'K-12 School', 'Hotel', 'Residence Hall', 'Self-Storage Facility',
@@ -231,11 +258,10 @@ if page == pages[4] :
 
 
     col1, col2, col3 = st.columns(3)
-
+    
     with col1:
         val_BuildingType = st.text_input('BuildingType', 'NonResidential')
         val_PrimaryPropertyType = st.selectbox('PrimaryPropertytype', propertytype_list, index = 7)
-#        val_PrimaryPropertyType = st.text_input('PrimaryPropertytype', 'Hotel')
         val_Latitude = st.number_input('Latitude', 47.61345)
         val_Longitude = st.number_input('Longitude', -122.34068)
 
