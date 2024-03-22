@@ -1,4 +1,3 @@
-
 import pandas as pd  
 import streamlit as st 
 import seaborn as sns 
@@ -8,11 +7,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 
 import feyn
-
-
 import pickle
-
-#df=pd.read_csv("Housing.csv")
 
 st.sidebar.title("Sommaire")
 
@@ -22,7 +17,7 @@ page = st.sidebar.radio("Aller vers la page :", pages)
 
 if page == pages[0] : 
     
-    st.write("## Contexte du projet")
+    st.title('Contexte du projet')
     
     st.write("Des relevés minutieux ont été effectués par les agents de la ville de Seattle en 2016. Néanmoins, ces relevés sont coûteux à obtenir, et à partir de ceux déjà réalisés, vous allons tenter de prédire les émissions de CO2 de bâtiments non destinés à l’habitation pour lesquels elles n’ont pas encore été mesurées.")
     
@@ -31,25 +26,27 @@ if page == pages[0] :
     st.write("Dans un premier temps, nous explorerons ce dataset. Puis nous l'analyserons visuellement pour en extraire des informations selon certains axes d'étude. Finalement nous implémenterons des modèles de Machine Learning pour prédire la consommation d'énergie.")
 
     file_image = r'./data/image/Seattle.JPG'
-    st.image(file_image)
+    st.image(file_image, caption= "logo de la ville de Seattle")
     
 if page == pages[1] :
-    st.write("## Exploration des données")
+    
+    st.title("Exploration des données")
     
     path_import     = "./data/source/"
     filename_import = "2016_Building_Energy_Benchmarking.csv"
     
     df = pd.read_csv(path_import + filename_import)
     
-    st.write("Echantillon du dataframe :")
-    st.dataframe(df.sample(5))
+    st.write("## Echantillon du dataframe :")
+    st.dataframe(df.sample(5), hide_index= True)
     
-    st.write("Description du dataframe :")
-    st.dataframe(df.describe(),)
+    st.write("## Description du dataframe :")
+    st.dataframe(df.describe(), hide_index= True)
     
 
 if page == pages[2] :
-    st.write("## Analyse des données")
+    st.title("Analyse des données")
+    
     path_import     = "data/cleaned/"
     filename_import = "df_for_modelisation.csv"
     
@@ -97,14 +94,11 @@ if page == pages[2] :
 
     
 if page == pages[3] :
-    
-    st.write("## Modélisation")
-    
+    st.title("Modélisation")
     
     filename_import = r'./data/cleaned/df_for_modelisation.csv'
     df = pd.read_csv(filename_import)
-    
-    
+        
     #Kernel Ridge
     variables = ['BuildingType','PrimaryPropertyType','Latitude','Longitude','NumberofBuildings','NumberofFloors',
                      'PropertyGFAParking','PropertyGFABuilding(s)','bulding_age','Steamuse_bool',
@@ -163,9 +157,10 @@ if page == pages[3] :
                             qlattice_model.mae(train).round(0),
                             qlattice_model.mae(test).round(0)
                             ]
+    
 
-    st.write("Résultats des 2 modèles :")
-    st.dataframe(tab_resultats)
+    st.write("## Résultats des 2 modèles :")
+    st.dataframe(tab_resultats, hide_index= True)
 
     kernel_dataset= pd.DataFrame()
     kernel_dataset['true_values']= y_test
@@ -183,14 +178,21 @@ if page == pages[3] :
 
     model_dataset = pd.concat([kernel_dataset, qlattice_dataset])
     
+    symbols = ['circle', 'square', 'diamond',
+               'cross', 'star', 'bowtie']
+    
     tab1, tab2, tab3 = st.tabs(["Résultats Kernel Ridge", "Résultats Qlattice", "Kernel Vs Qlattice"])
+    
     with tab1:
         fig1 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values',
                           color= 'PrimaryPropertyType',
                           trendline="ols",
                           trendline_color_override="red",
                           trendline_scope="overall",
-                          title= "Kernel results values")
+                          title= "Kernel results values",
+                          symbol = kernel_dataset['PrimaryPropertyType'],
+                          symbol_sequence= symbols
+                          )
         st.plotly_chart(fig1, use_container_width=True)
         
         fig2 = px.scatter(kernel_dataset, x= 'true_values', y= 'predict_values',
@@ -199,7 +201,10 @@ if page == pages[3] :
                           trendline="ols", 
                           trendline_color_override="red",
                           trendline_scope="overall",
-                          title= "Kernel results Log values")
+                          title= "Kernel results Log values",
+                          symbol = kernel_dataset['PrimaryPropertyType'],
+                          symbol_sequence= symbols
+                          )
         st.plotly_chart(fig2, use_container_width=True)
         
  
@@ -209,7 +214,10 @@ if page == pages[3] :
                           trendline="ols",
                           trendline_color_override="red",
                           trendline_scope="overall",
-                          title= "Qlattice results values")
+                          title= "Qlattice results values",
+                          symbol = qlattice_dataset['PrimaryPropertyType'],
+                          symbol_sequence= symbols
+                          )
         
         st.plotly_chart(fig1, use_container_width=True)
         
@@ -219,7 +227,10 @@ if page == pages[3] :
                           trendline="ols",
                           trendline_color_override="red",
                           trendline_scope="overall",
-                          title= "Qlattice results Log values")
+                          title= "Qlattice results Log values",
+                          symbol = qlattice_dataset['PrimaryPropertyType'],
+                          symbol_sequence= symbols
+                          )
         st.plotly_chart(fig2, use_container_width=True)
         
         st.write("Qlattice semble avoir du mal avec bâtiments de type 'Hospital' ou 'Office'.")
@@ -230,19 +241,24 @@ if page == pages[3] :
         
         fig1 = px.scatter(model_dataset, x= 'true_values' , y= 'predict_values',
                           color = 'model',
-                          trendline="ols", #trendline_options=dict(log_x=True),                          
-                          title= "Kernel vs Qlattice results values")
+                          color_discrete_sequence= ['blue', 'red'],
+                          trendline="ols",                         
+                          title= "Kernel vs Qlattice results values",
+                          symbol = model_dataset['model'],
+                          symbol_sequence= symbols
+                          )
         st.plotly_chart(fig1, use_container_width=True)
         
         fig2 = px.scatter(model_dataset, x= 'true_values' , y= 'predict_values',
                           color = 'model',
+                          color_discrete_sequence= ['blue', 'red'],
                           log_x=True, log_y= True,
                           trendline="ols", #trendline_options=dict(log_x=True),                          
                           title= "Kernel vs Qlattice results values")
         st.plotly_chart(fig2, use_container_width=True)
     
 if page == pages[4] :
-    st.write("## Prédictions")
+    st.title("Prédictions")
    
     
     propertytype_list = ['Retail Store', 'Mixed Use Property', 'Worship Facility',
@@ -285,5 +301,7 @@ if page == pages[4] :
     
     reponse_qlattice = qlattice_model.predict(prediction_df)[0].round(0)
     
+    st.write("### ")
     st.write("### Qlattice prediction")
-    st.write("Site Energy Use:", f"{reponse_qlattice:,.0f}")
+    st.write("")
+    st.write("### Site Energy Use:", f"{reponse_qlattice:,.0f}")
