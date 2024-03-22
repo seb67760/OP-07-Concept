@@ -5,7 +5,6 @@ import matplotlib.pyplot as plt
 import plotly.express as px
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
-
 import feyn
 import pickle
 
@@ -46,7 +45,6 @@ if page == pages[1] :
 
 if page == pages[2] :
     st.title("Analyse des données")
-    
     path_import     = "data/cleaned/"
     filename_import = "df_for_modelisation.csv"
     
@@ -56,30 +54,43 @@ if page == pages[2] :
     tab1, tab2 = st.tabs(['Nbre de bâtiments par quartier et par type', 'Bâtiments par longitude et latitude'])
     with tab1:
         fig = plt.figure(figsize=(10, 4))
-        sns.countplot(x='Neighborhood', data = df, order= df['Neighborhood'].value_counts().index)
+        sns.countplot(x='Neighborhood', data = df, 
+                      order= df['Neighborhood'].value_counts().index)
         plt.title('Nbre de Batiments par quartier')
         plt.xticks(rotation = 90)
         st.pyplot(fig)  
 
         fig = plt.figure(figsize=(10, 4))
-        sns.countplot(x='Neighborhood', data = df, order= df['Neighborhood'].value_counts().index, hue= "BuildingType")
+        sns.countplot(x='Neighborhood', data = df,
+                      order= df['Neighborhood'].value_counts().index,
+                      hue= "BuildingType",
+                      palette= ['blue', 'red', 'green'])
         plt.title('Nbre de Batiments par quartier et par type de batiment')
         plt.xticks(rotation = 90)
-        st.pyplot(fig) #, use_container_width=True)
+        st.pyplot(fig)
 
     with tab2:
-        fig = px.scatter(df[df['TotalGHGEmissions']>0], x="Longitude", y="Latitude", title="Bâtiments par longitude et latitude", size= "TotalGHGEmissions", color="BuildingType")
+        fig = px.scatter(df[df['TotalGHGEmissions']>0], x="Longitude", y="Latitude",
+                         title="Bâtiments par longitude et latitude et par type de batiment",
+                         color="BuildingType",
+                         color_discrete_sequence= ['blue', 'red', 'green'])
         st.plotly_chart(fig, use_container_width=True)
 
  
     tab3, tab4 = st.tabs(["Emission de CO2 en fonction du type de building", "Evolution des émissions de CO2 en fonction de la surface"])
     with tab3:
-        fig2 = px.scatter(df, x="TotalGHGEmissions", y="BuildingType", title="Emission de CO2 en fonction du type de building")
+        fig2 = px.scatter(df, x="TotalGHGEmissions", y="BuildingType",
+                          title="Emission de CO2 en fonction du type de building")
         st.plotly_chart(fig2)
+        
     with tab4:
-        fig3 = px.scatter(df, x="PropertyGFABuilding(s)", y="TotalGHGEmissions", title="Evolution des émissions de CO2 en fonction de la surface")
+        fig3 = px.scatter(df, x="PropertyGFABuilding(s)", y="TotalGHGEmissions",
+                          title="Evolution des émissions de CO2 en fonction de la surface et du type de batiment",
+                          color="BuildingType",
+                          color_discrete_sequence= ['blue', 'red', 'green']
+                          )
         fig3.update_xaxes(title_text="Surface en m²", type="log")
-        fig3.update_yaxes(title_text="Emissions de CO2", type="log") #, row=1, col=2)
+        fig3.update_yaxes(title_text="Emissions de CO2", type="log")
         st.plotly_chart(fig3)
 
     variables_heatmap = ['Latitude','Longitude','NumberofBuildings','NumberofFloors',
@@ -94,6 +105,7 @@ if page == pages[2] :
 
     
 if page == pages[3] :
+    
     st.title("Modélisation")
     
     filename_import = r'./data/cleaned/df_for_modelisation.csv'
@@ -138,7 +150,7 @@ if page == pages[3] :
    # Qlattice
     df = pd.read_csv(filename_import)    
     variables2 = ['BuildingType','PrimaryPropertyType','Latitude','Longitude','NumberofBuildings','NumberofFloors',
-                     'PropertyGFAParking','PropertyGFABuilding(s)','bulding_age','Steamuse_bool',
+                  'PropertyGFAParking','PropertyGFABuilding(s)','bulding_age','Steamuse_bool',
                  'NaturalGas_bool','SiteEnergyUse(kBtu)']
     
     X_qlattice = df[variables2]    
@@ -149,7 +161,7 @@ if page == pages[3] :
     train_score_Q = qlattice_model.r2_score(train)
     test_score_Q = qlattice_model.r2_score(test)
 
-    tab_resultats.loc[1] = [ "Qlattice",
+    tab_resultats.loc[1] = ["Qlattice",
                             qlattice_model.r2_score(train),
                             qlattice_model.r2_score(test),
                             qlattice_model.rmse(train).round(0),
@@ -253,14 +265,13 @@ if page == pages[3] :
                           color = 'model',
                           color_discrete_sequence= ['blue', 'red'],
                           log_x=True, log_y= True,
-                          trendline="ols", #trendline_options=dict(log_x=True),                          
+                          trendline="ols",                          
                           title= "Kernel vs Qlattice results values")
         st.plotly_chart(fig2, use_container_width=True)
     
 if page == pages[4] :
     st.title("Prédictions")
    
-    
     propertytype_list = ['Retail Store', 'Mixed Use Property', 'Worship Facility',
     'Small- and Mid-Sized Office', 'Other', 'Large Office',
     'K-12 School', 'Hotel', 'Residence Hall', 'Self-Storage Facility',
@@ -270,19 +281,18 @@ if page == pages[4] :
     'Senior Care Community', 'Low-Rise Multifamily', 'Laboratory',
     'Office', 'Hospital']
 
-
     col1, col2, col3 = st.columns(3)
     
     with col1:
         val_BuildingType = st.text_input('BuildingType', 'NonResidential')
         val_PrimaryPropertyType = st.selectbox('PrimaryPropertytype', propertytype_list, index = 7)
-        val_Latitude = st.number_input('Latitude', 47.61345)
-        val_Longitude = st.number_input('Longitude', -122.34068)
+        val_Latitude = st.number_input('Latitude', min_value= -90.00, max_value= 90.00, value= 47.61345, step= 1.0)
+        val_Longitude = st.number_input('Longitude', min_value= -180.00, max_value= 180.00, value= -122.34068, step= 1.0)
 
     with col2:
         val_NumberofBuildings = st.number_input('Numberofbuilding', 1)
         val_NumberofFloors = st.number_input('NumberofFloors', 9)
-        val_PropertyGFAParking = st.number_input('PropertyGFAParking', 0)
+        val_PropertyGFAParking = st.number_input('PropertyGFAParking', step= 1000)
         val_PropertyGFABuilding = st.number_input('PropertyGFABuilding', 104000, step= 1000)
         
     with col3:
@@ -290,13 +300,23 @@ if page == pages[4] :
         val_Steamuse_bool = st.number_input('Streamuse_bool', 1)
         val_NaturalGas_bool = st.number_input('NaturalGas_bool', 1)
         
-    prediction_df = pd.DataFrame([[val_BuildingType, val_PrimaryPropertyType, val_Latitude, val_Longitude,
-                                   val_NumberofBuildings, val_NumberofFloors, val_PropertyGFAParking, val_PropertyGFABuilding,
-                                   val_bulding_age, val_Steamuse_bool, val_NaturalGas_bool, 0]],
+    
+    prediction_df = pd.DataFrame([[val_BuildingType,
+                                   val_PrimaryPropertyType,
+                                   val_Latitude,
+                                   val_Longitude,
+                                   val_NumberofBuildings,
+                                   val_NumberofFloors,
+                                   val_PropertyGFAParking,
+                                   val_PropertyGFABuilding,
+                                   val_bulding_age,
+                                   val_Steamuse_bool,
+                                   val_NaturalGas_bool,
+                                   0]],
                                  columns= ['BuildingType','PrimaryPropertyType', 'Latitude', 'Longitude',
                                            'NumberofBuildings', 'NumberofFloors', 'PropertyGFAParking','PropertyGFABuilding(s)',
-                                              'bulding_age', 'Steamuse_bool', 'NaturalGas_bool', 'SiteEnergyUse(kBtu)'])
-        
+                                           'bulding_age', 'Steamuse_bool', 'NaturalGas_bool', 'SiteEnergyUse(kBtu)'])
+    
     qlattice_model = feyn.Model.load('model/qlattice_model.json')
     
     reponse_qlattice = qlattice_model.predict(prediction_df)[0].round(0)
