@@ -290,15 +290,15 @@ if page == pages[4] :
         val_Longitude = st.number_input('Longitude', min_value= -180.00, max_value= 180.00, value= -122.34068, step= 1.0)
 
     with col2:
-        val_NumberofBuildings = st.number_input('Numberofbuilding', 1)
-        val_NumberofFloors = st.number_input('NumberofFloors', 9)
-        val_PropertyGFAParking = st.number_input('PropertyGFAParking', step= 1000)
-        val_PropertyGFABuilding = st.number_input('PropertyGFABuilding', 104000, step= 1000)
+        val_NumberofBuildings = st.number_input('Numberofbuilding', min_value=1, value = 1)
+        val_NumberofFloors = st.number_input('NumberofFloors',min_value= 0, value= 9, step = 1)
+        val_PropertyGFAParking = st.number_input('PropertyGFAParking', min_value= 0, value= 0, step= 1000)
+        val_PropertyGFABuilding = st.number_input('PropertyGFABuilding', min_value= 0, value= 104000, step= 1000)
         
     with col3:
-        val_bulding_age = st.number_input('bulding_age', 91)
-        val_Steamuse_bool = st.number_input('Streamuse_bool', 1)
-        val_NaturalGas_bool = st.number_input('NaturalGas_bool', 1)
+        val_bulding_age = st.number_input('bulding_age', min_value = 0, value= 91, step = 1)
+        val_Steamuse_bool = st.number_input('Streamuse_bool', min_value = 0, max_value = 1, value =1)
+        val_NaturalGas_bool = st.number_input('NaturalGas_bool', min_value = 0, max_value = 1, value = 1)
         
     
     prediction_df = pd.DataFrame([[val_BuildingType,
