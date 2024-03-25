@@ -250,14 +250,14 @@ if page == pages[3] :
      
                
     with tab3:
-        
+        symbols2 = ['circle', 'star']
         fig1 = px.scatter(model_dataset, x= 'true_values' , y= 'predict_values',
                           color = 'model',
                           color_discrete_sequence= ['blue', 'red'],
                           trendline="ols",                         
                           title= "Kernel vs Qlattice results values",
                           symbol = model_dataset['model'],
-                          symbol_sequence= symbols
+                          symbol_sequence= symbols2
                           )
         st.plotly_chart(fig1, use_container_width=True)
         
@@ -266,9 +266,9 @@ if page == pages[3] :
                           color_discrete_sequence= ['blue', 'red'],
                           log_x=True, log_y= True,
                           trendline="ols",                          
-                          title= "Kernel vs Qlattice results values"
+                          title= "Kernel vs Qlattice results values",
                           symbol = model_dataset['model'],
-                          symbol_sequence= symbols
+                          symbol_sequence= symbols2
                           )
         st.plotly_chart(fig2, use_container_width=True)
     
