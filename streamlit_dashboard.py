@@ -266,7 +266,10 @@ if page == pages[3] :
                           color_discrete_sequence= ['blue', 'red'],
                           log_x=True, log_y= True,
                           trendline="ols",                          
-                          title= "Kernel vs Qlattice results values")
+                          title= "Kernel vs Qlattice results values"
+                          symbol = model_dataset['model'],
+                          symbol_sequence= symbols
+                          )
         st.plotly_chart(fig2, use_container_width=True)
     
 if page == pages[4] :
