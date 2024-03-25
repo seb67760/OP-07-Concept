@@ -245,7 +245,7 @@ if page == pages[3] :
                           )
         st.plotly_chart(fig2, use_container_width=True)
         
-        st.write("Qlattice semble avoir du mal avec bâtiments de type 'Warehouse'.")
+        st.write("Qlattice semble avoir du mal avec les bâtiments de type 'Warehouse'.")
         st.write("Qlattice semble être beaucoup plus performant avec 'Hotel', 'Large office' et 'K-12 School' par exemple.")
      
                
